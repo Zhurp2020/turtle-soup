@@ -3,6 +3,7 @@ import game
 
 Game = game.game()
 
+
 def clear_input():
     return ''
 def push_to_chatbot(msg,history):
@@ -22,16 +23,24 @@ with gr.Blocks() as demo:
     title = gr.Markdown('# 海龟汤')
     
     description = gr.Markdown('海龟汤的规则是这样的：出题人提出一个难以理解的事件，玩家可以提出任何问题以试图缩小范围并找出事件背后真正的原因，但出题者仅能以“是”、“不是”或“没有关系（与事件无关）”来回答问题。')
+
     
-    chatbot = gr.Chatbot()
-    
+    with gr.Row():
+        token_input = gr.Textbox(placeholder='输入你的API Token，按回车确认',scale=4)
+        
+        api_btn = gr.Button('确认',variant='primary',scale=1,size='sm')
+        
+        token_input.submit(disable_element,inputs={token_input,api_btn},outputs=[token_input,api_btn]).then(Game.set_api_token,inputs=token_input).then(enable_element,inputs={token_input,api_btn},outputs=[token_input,api_btn])
+        
+        api_btn.click(disable_element,inputs={token_input,api_btn},outputs=[token_input,api_btn]).then(Game.set_api_token,inputs=token_input).then(enable_element,inputs={token_input,api_btn},outputs=[token_input,api_btn])
+
     
     with gr.Row():
         msg_input = gr.Textbox(placeholder='输入你的问题，按回车发送',scale=4)
         
         send_btn = gr.Button('发送',variant='primary',scale=1,size='sm')
 
-        
+    chatbot = gr.Chatbot()
     
     with gr.Row():
         start = gr.Button('开始游戏')
