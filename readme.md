@@ -1,7 +1,7 @@
 # turtle soup
 ## known issues
 + 模型抽风(Resolved with rule matching at alpha 1.1)
-+ 判断游戏结束(Resolved at alpha 1.1)
++ 判断游戏结束(Partly resolved)
 ### Roadmap
 + fix bugs
 + 美化页面
@@ -13,3 +13,6 @@
 + 增加了判断游戏是否结束的功能（untested!）
 + 通过规则，让模型重新生成失败的故事
 + 完善后端接口和注释
+### V1.2 
++ 修复了重置游戏后会报错的bug
++ 当没有剩余提问之后，现在游戏可以正常结束并且告诉玩家真相了。

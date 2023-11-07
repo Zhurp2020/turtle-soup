@@ -66,7 +66,8 @@ class game(object):
         ask erniebot if game has ended
         return: is_end, bool
         '''
-        _,is_end = self.send_message('玩家是否猜到了故事的真相？仅以True或False回答，不要给出其他信息。你的回答应该是True或者False或者无法判断')
+        _,is_end = self.send_message('玩家是否猜到了故事的真相？仅以“是”或“不是”回答，不要给出其他信息。你的回答应该是“是”或“不是”或者“无法判断”')
+        print(_,is_end)
         return is_end
     
     def check_bad_story(self,story:str) -> bool:
@@ -108,20 +109,26 @@ class game(object):
         self.rounds -= 1
         
         is_end = self.ask_if_end()['content']
+        
+        
+        
         if is_end == 'True':
             self.status = 'win'
             self.end_game()
-        elif round == 0:
+        elif self.rounds == 0:
             self.status = 'lose'
             self.end_game()
-        else:
-            return self.dialogue_pure_text     
+
+        return self.dialogue_pure_text     
         
     def end_game(self):
         if self.status =='win':
             self.dialogue_pure_text.append([None,'恭喜你，你赢了，可以按下重置按钮，然后重新开始游戏'])
         elif self.status == 'lose':
-            self.dialogue_pure_text.append([None,'很遗憾，你输了，可以按下重置按钮，然后重新开始游戏'])
+            question,response = self.send_message('我猜不出故事的真相，我认输，请你告诉我故事的真相。')
+            #self.add_to_dialogue(question)
+            self.add_to_dialogue(response)
+            self.dialogue_pure_text.append([None,'很遗憾，你没有提问机会了，可以按下重置按钮，然后重新开始游戏'])
             
     def reset_game(self):
         '''
@@ -129,7 +136,7 @@ class game(object):
         '''
         self.status = None
         self.dialogues = []
-        self.dialogue_pure_text = []
+        self.dialogue_pure_text = [['开始游戏',None]]
         self.rounds = 10
     
     
@@ -150,7 +157,7 @@ class game(object):
         '''
         return remaining rounds
         '''
-        return '剩余轮数：{}'.format(self.rounds)
+        return '剩余回合数：{}'.format(self.rounds)
     
     def get_full_dialogue(self) -> list:
         return self.dialogues

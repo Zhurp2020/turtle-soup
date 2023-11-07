@@ -10,6 +10,11 @@ def push_to_chatbot(msg,history):
     return history
 def disable_element(element):
     return {e:type(e)(interactive=False) for e in element}
+def check_remain_rounds(elements):
+    if Game.rounds == 0:
+        return disable_element(elements)
+    else:
+        return enable_element(elements)
 def enable_element(element):
     return {e:type(e)(interactive=True) for e in element}
 
@@ -39,12 +44,11 @@ with gr.Blocks() as demo:
         rounds = gr.Label('剩余回合数：10')
        
         
-    send_btn.click(disable_element,inputs={send_btn,msg_input},outputs=[send_btn,msg_input]).then(push_to_chatbot,inputs=[msg_input,chatbot],outputs=chatbot,queue=False).then(Game.step, inputs=msg_input, outputs=chatbot,show_progress='full').then(clear_input,outputs=msg_input).then(enable_element,inputs={send_btn,msg_input},outputs=[send_btn,msg_input]).then(Game.get_rounds,outputs=rounds)
+    send_btn.click(disable_element,inputs={send_btn,msg_input},outputs=[send_btn,msg_input]).then(push_to_chatbot,inputs=[msg_input,chatbot],outputs=chatbot,queue=False).then(Game.step, inputs=msg_input, outputs=chatbot,show_progress='full').then(clear_input,outputs=msg_input).then(check_remain_rounds,inputs={send_btn,msg_input},outputs=[send_btn,msg_input]).then(Game.get_rounds,outputs=rounds)
     
 
-    msg_input.submit(disable_element,inputs={send_btn,msg_input},outputs=[send_btn,msg_input]).then(push_to_chatbot,inputs=[msg_input,chatbot],outputs=chatbot).then(Game.step, inputs=msg_input, outputs=chatbot,show_progress='full').then(clear_input,outputs=msg_input).then(enable_element,inputs={send_btn,msg_input},outputs=[send_btn,msg_input]).then(Game.get_rounds,outputs=rounds)
+    msg_input.submit(disable_element,inputs={send_btn,msg_input},outputs=[send_btn,msg_input]).then(push_to_chatbot,inputs=[msg_input,chatbot],outputs=chatbot).then(Game.step, inputs=msg_input, outputs=chatbot,show_progress='full').then(clear_input,outputs=msg_input).then(check_remain_rounds,inputs={send_btn,msg_input},outputs=[send_btn,msg_input]).then(Game.get_rounds,outputs=rounds)
         
     
-        
 
 demo.launch()
