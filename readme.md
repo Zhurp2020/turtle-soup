@@ -24,3 +24,6 @@
 + 增加了top_p和temperature调参的功能
 + 优化system prompt
 + 增加了调整风格的框
+### Alpha V 1.5
++ 调整风格的功能已经上线
++ 增加了获取token的链接

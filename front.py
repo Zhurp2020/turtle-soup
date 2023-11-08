@@ -22,7 +22,8 @@ def enable_element(element):
 with gr.Blocks() as demo:
     title = gr.Markdown('# 海龟汤')
     
-    description = gr.Markdown('海龟汤的规则是这样的：出题人提出一个难以理解的事件，玩家可以提出任何问题以试图缩小范围并找出事件背后真正的原因，但出题者仅能以“是”、“不是”或“没有关系（与事件无关）”来回答问题。')
+    description = gr.Markdown('''海龟汤的规则是这样的：出题人提出一个难以理解的事件，玩家可以提出任何问题以试图缩小范围并找出事件背后真正的原因，但出题者仅能以“是”、“不是”或“没有关系（与事件无关）”来回答问题。   
+    如果你不知道如何获得API Token 可以[点击这里](https://aistudio.baidu.com/index/accessToken)''')
 
     
     with gr.Row():
@@ -39,7 +40,7 @@ with gr.Blocks() as demo:
     with gr.Row():
         top_p_slide = gr.Slider(minimum=0,maximum=1,step=0.01,value=0.8,label='top_p')
         temp_slide = gr.Slider(minimum=0.01,maximum=1,step=0.01,value=0.95,label='temperature')
-        stytle_check = gr.CheckboxGroup(choices=['悬疑','恐怖','搞笑'])
+
         
         top_p_slide.change(Game.set_parameters,inputs=[top_p_slide,temp_slide])
         temp_slide.change(Game.set_parameters,inputs=[top_p_slide,temp_slide])
@@ -52,11 +53,13 @@ with gr.Blocks() as demo:
         send_btn = gr.Button('发送',variant='primary',scale=1,size='sm')
     
     with gr.Row():
+        style_choose = gr.Dropdown(choices=['悬疑','恐怖','搞笑','爱情','现实','离谱','超自然','科幻','历史','友情'],value='悬疑',multiselect=True, max_choices=3,label='选择故事风格',allow_custom_value=True)
+        
         start = gr.Button('开始游戏')
-        start.click(disable_element,inputs={start},outputs=[start]).then(Game.start_game,outputs=chatbot,show_progress='full')
+        start.click(disable_element,inputs={start,style_choose},outputs=[start,style_choose]).then(Game.start_game,inputs =style_choose ,outputs=chatbot,show_progress='full')
         
         clear = gr.ClearButton([msg_input, chatbot],value='重置游戏',variant='stop')
-        clear.click(Game.reset_game).then(enable_element,inputs={start},outputs=[start])
+        clear.click(Game.reset_game).then(enable_element,inputs={start,style_choose},outputs=[start,style_choose])
         
          
         rounds = gr.Label('剩余回合数：10')
