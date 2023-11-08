@@ -35,12 +35,21 @@ with gr.Blocks() as demo:
         api_btn.click(disable_element,inputs={token_input,api_btn},outputs=[token_input,api_btn]).then(Game.set_api_token,inputs=token_input).then(enable_element,inputs={token_input,api_btn},outputs=[token_input,api_btn])
 
     
+
+    with gr.Row():
+        top_p_slide = gr.Slider(minimum=0,maximum=1,step=0.01,value=0.8,label='top_p')
+        temp_slide = gr.Slider(minimum=0.01,maximum=1,step=0.01,value=0.95,label='temperature')
+        stytle_check = gr.CheckboxGroup(choices=['悬疑','恐怖','搞笑'])
+        
+        top_p_slide.change(Game.set_parameters,inputs=[top_p_slide,temp_slide])
+        temp_slide.change(Game.set_parameters,inputs=[top_p_slide,temp_slide])
+    
+    chatbot = gr.Chatbot()
+    
     with gr.Row():
         msg_input = gr.Textbox(placeholder='输入你的问题，按回车发送',scale=4)
         
         send_btn = gr.Button('发送',variant='primary',scale=1,size='sm')
-
-    chatbot = gr.Chatbot()
     
     with gr.Row():
         start = gr.Button('开始游戏')

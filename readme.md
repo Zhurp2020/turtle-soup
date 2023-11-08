@@ -20,3 +20,7 @@
 ### Alpha V 1.3
 + Removed redundant files and optimize prompt
 + 增加了输入API token的功能
+### Alpha V 1.4
++ 增加了top_p和temperature调参的功能
++ 优化system prompt
++ 增加了调整风格的框

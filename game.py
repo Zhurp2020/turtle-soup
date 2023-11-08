@@ -34,6 +34,8 @@ class game(object):
         self.dialogues = []
         self.dialogue_pure_text = [['开始游戏',None]]
         self.rounds = 10
+        self.top_p = 0.8
+        self.temperature = 0.95
         
         
         
@@ -46,18 +48,32 @@ class game(object):
         erniebot.access_token = token
         
         
+    
+    def set_parameters(self,top_p:float,temperature:float) -> None:
+        '''
+        set parameters for erniebot
+        top_p: 以使生成的token从概率和恰好达到或超过top_p的token集合中采样得到。float in [0,1], default = 0.8
+        temperature: 控制采样的随机性, float in (0,1.0], default = 0.95,to
+        '''
+        self.top_p = top_p
+        self.temperature = temperature
         
-    def send_message(self,msg:str) -> dict:
+        
+        
+    def send_message(self,msg:str,system_msg:str ='') -> dict:
         '''
         send message to erniebot
         msg: message to send, str
+        system_msg: system message to send, str, default is empty
         return: sent message and response from erniebot, two dicts, {'role': 'user', 'content': str},{'role': 'assistant', 'content': str}
         '''
         new_msg = {'role': 'user', 'content': msg}
         self.dialogues.append(new_msg)
         response = erniebot.ChatCompletion.create(
             model='ernie-bot',
-            messages=self.dialogues)
+            messages=self.dialogues,
+            system = system_msg,
+            top_p=self.top_p,temperature=self.temperature)
         result_msg = {'role': 'assistant', 'content': response.result}
         self.dialogues.append(result_msg)
         return new_msg, result_msg
@@ -78,7 +94,7 @@ class game(object):
         ask erniebot if game has ended
         return: is_end, bool
         '''
-        _,is_end = self.send_message('玩家是否猜到了故事的真相？仅以“是”或“不是”回答，不要给出其他信息。你的回答应该是“是”或“不是”或者“无法判断”')
+        _,is_end = self.send_message('玩家是否猜到了故事的真相？仅以“是”或“不是”回答，不要给出其他信息。你的回答应该是“是”或“不是”或者“无法判断”',system_msg='你是海龟汤游戏的主持人。对于这个问题，你应该回答“是”或“不是”或者“无法判断”')
         print(_,is_end)
         return is_end
     
@@ -101,7 +117,7 @@ class game(object):
         
         self.status = 'in_process'
         init_msg = init_message
-        _,init_response = self.send_message(init_msg)
+        _,init_response = self.send_message(init_msg,'你需要扮演海龟汤游戏的主持人，来回答玩家的提问')
         while self.check_bad_story(init_response['content']):
             self.dialogues = []
             _,init_response = self.send_message(init_msg)
@@ -121,8 +137,6 @@ class game(object):
         self.rounds -= 1
         
         is_end = self.ask_if_end()['content']
-        
-        
         
         if is_end == 'True':
             self.status = 'win'
