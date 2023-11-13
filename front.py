@@ -61,9 +61,9 @@ with gr.Blocks() as demo:
         clear = gr.ClearButton([msg_input, chatbot],value='重置游戏',variant='stop')
         clear.click(Game.reset_game).then(enable_element,inputs={start,style_choose},outputs=[start,style_choose])
         
-         
+        
         rounds = gr.Label('剩余回合数：10')
-       
+    
         
     send_btn.click(disable_element,inputs={send_btn,msg_input},outputs=[send_btn,msg_input]).then(push_to_chatbot,inputs=[msg_input,chatbot],outputs=chatbot,queue=False).then(Game.step, inputs=msg_input, outputs=chatbot,show_progress='full').then(clear_input,outputs=msg_input).then(check_remain_rounds,inputs={send_btn,msg_input},outputs=[send_btn,msg_input]).then(Game.get_rounds,outputs=rounds)
     

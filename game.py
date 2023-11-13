@@ -13,12 +13,28 @@ init_message = '''
 【玩家】问【主持人】：是这个陌生人舔了她的手吗？【主持人】答：是的
 【主持人】解答谜题：有一个小偷潜入她的家中，把狗杀死吊在天花板上。滴水声是狗在滴血，舔女孩手的也不是她的狗，而是那个人。
 
-现在，作为【主持人】，请你构思一个故事作为谜面。这个故事可以包含以下元素：{}，但总体上要符合现实生活的逻辑。将这个故事转换成一个表面上令人费解的情景作为谜面。然后，对我说：“开始游戏”，并告诉我谜面。接下来，我将通过提问来猜测谜底。请不要提前告诉我谜底，我希望进行多轮对话，直到我猜出谜底。
+现在，作为【主持人】，请你构思一个故事作为谜面。这个故事可以包含以下元素：{}，但总体上要符合现实生活的逻辑。将这个故事转换成一个表面上令人费解的情景作为谜面。然后，对我说：“开始游戏”，并告诉我谜面。接下来，我将通过提问来猜测谜底。请不要提前告诉我谜底，我希望进行多轮对话，直到我猜出谜底。在玩家认输之后，请你告诉我谜底。
 
 请确保你完全理解了规则，并且已经准备好了谜题。现在，你可以扮演【主持人】，对我说：“开始游戏”并告诉我谜面。
 
 注意：你要扮演主持人的角色。你不需要生成问题。你需要生成谜面，让我扮演玩家的角色来提问
 '''
+
+def check_api_token(token:str) -> bool:
+    '''
+    check if api token is valid
+    token: api token, str
+    return: is_valid, bool
+    '''
+    erniebot.api_type = 'aistudio'
+    erniebot.access_token = token
+    try:
+        erniebot.ChatCompletion.create(
+            model='ernie-bot',
+            messages=[{'role': 'user', 'content': '你好'}])
+        return True
+    except:
+        return False
 
 
 class game(object):
@@ -33,7 +49,7 @@ class game(object):
         self.status = None
         self.dialogues = []
         self.dialogue_pure_text = [['开始游戏',None]]
-        self.rounds = 10
+        self.rounds = 3
         self.top_p = 0.8
         self.temperature = 0.95
         
@@ -162,8 +178,17 @@ class game(object):
         elif self.status == 'lose':
             question,response = self.send_message('我猜不出故事的真相，我认输并放弃猜测，请你告诉我故事的真相。','玩家已经认输，作为主持人请你说出谜底')
             #self.add_to_dialogue(question)
-            self.add_to_dialogue(response)
+            self.dialogue_pure_text.append([None,response['content']])
             self.dialogue_pure_text.append([None,'很遗憾，你没有提问机会了，可以按下重置按钮，然后重新开始游戏'])
+            
+    def ask_for_hint(self):
+        '''
+        ask for hint, send message to erniebot, return dialogue_pure_text
+        '''
+        question,response = self.send_message('我想要一个提示','玩家想要一个提示，作为主持人请你给出一个提示')
+        self.add_to_dialogue(question)
+        self.add_to_dialogue(response)
+        return self.dialogue_pure_text
             
     def reset_game(self):
         '''
