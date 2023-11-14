@@ -121,7 +121,7 @@ class game(object):
         '''
         check if story is bad, if bad, return True
         '''
-        if '玩家问主持人' in story or '【玩家】问【主持人】' in story:
+        if '玩家问主持人' in story or '【玩家】问【主持人】' in story or '谜底是' in story:
             return True
         else:
             return False
@@ -142,7 +142,7 @@ class game(object):
             style = '、'.join(style)
         self.set_story_style(style)
         init_msg = self.init_message
-        _,init_response = self.send_message(init_msg,'你需要扮演海龟汤游戏的主持人，来回答玩家的提问')
+        _,init_response = self.send_message(init_msg,'你需要扮演海龟汤游戏的主持人，告诉玩家谜面。')
         while self.check_bad_story(init_response['content']):
             self.dialogues = []
             _,init_response = self.send_message(init_msg)

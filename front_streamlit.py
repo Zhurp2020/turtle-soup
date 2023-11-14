@@ -107,9 +107,9 @@ def create_new_sys_msg() -> None:
     with st.spinner('文心思考中...'):
         st.session_state.get('game_object').step(st.session_state.get('question_input'))
     res = st.session_state.get('game_object').get_dialogue_pure_text()[-1][1]
-    if res.startswith('很遗憾'):
+    if res.startswith('很遗憾，你没有提问'):
         res = st.session_state.get('game_object').get_dialogue_pure_text()[-3][1]
-    elif res.startswith('恭喜你'):
+    elif res.startswith('恭喜你，你赢了'):
         res = st.session_state.get('game_object').get_dialogue_pure_text()[-2][1]
     full_res = ''
     for char in res:
