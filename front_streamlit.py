@@ -122,6 +122,16 @@ def set_model_para() -> None:
     if st.session_state.get('game_object')!= None:
         st.session_state['game_object'].set_parameters(top_p=st.session_state['top_p'],temperature=st.session_state['temp'])
 
+def display_toast()-> None:
+    if st.session_state.get('question_state') == None:
+        rounds = st.session_state.get('game_object').rounds
+        if rounds== 7 :
+            st.info('你还有7次提问机会 \n 可以点击上方按钮获得更多线索')
+        # st.session_state['hint_1'] ='sent'
+        if 2<= rounds <= 3:
+            st.warning('你还有{}次提问机会'.format(rounds))
+        elif rounds == 1:
+            st.error('你只有1次提问机会')
 
 
 
@@ -142,7 +152,7 @@ with st.sidebar:
 
         
     
-st.title('文心海龟汤')
+st.title('【Hackathon 5th】海龟汤——逆向推理文字游戏🐢')
 
 display_token_message()
 
@@ -150,31 +160,31 @@ style_choose = st.multiselect('选择故事风格',['悬疑','恐怖','搞笑','
 
 
 
-col1,col2,col3,col4,_ = st.columns([1,1,1,2,5])
+col1,col2,col3,col4,_ = st.columns([1,1,1,1,1])
 
 with col1:
     
-    start = st.button(label='开始游戏',on_click=game_state_to_start,disabled=not(clear_start_game()))
+    start = st.button(label='开始游戏',use_container_width= True, on_click=game_state_to_start,disabled=not(clear_start_game()))
     
 if st.session_state.get('game_state') in ['start','started']:
     with col2:
-        reset = st.button(label='重置游戏',type='primary',on_click=reset_game)
+        reset = st.button(label='重置游戏',type='primary',use_container_width= True,on_click=reset_game)
+
 if st.session_state.get('game_state') in ['started'] and st.session_state.get('game_object').rounds <= 7:
     with col3:
-        hint = st.button(label='给点提示',on_click=hint_state_to_sent)
+        hint = st.button(label='给点提示',use_container_width= True,on_click=hint_state_to_sent)
 if st.session_state.get('hint_state') == 'sent':
     with col4:
         with st.spinner('寻找线索中...'):
             st.session_state.get('game_object').ask_for_hint()
     st.session_state['hint_state'] = None
-        
+
         
         
 start_game()
     
 if st.session_state.get('game_state') == 'started': 
-    
-    st.write('#### 剩余回合数：{}'.format(st.session_state.get('game_object').rounds))
+    #st.write('#### 剩余回合数：{}'.format(st.session_state.get('game_object').rounds))
     
     for messages in st.session_state['game_object'].get_dialogue_pure_text():
         if messages[0]:
@@ -184,15 +194,21 @@ if st.session_state.get('game_state') == 'started':
             with st.chat_message('assistant',avatar='🐢'):
                 st.markdown(messages[1])
 
-    question_input= st.chat_input("输入问题，按回车发送",key='question_input',disabled=st.session_state.get('game_object').status in ['win','lose'])
+    display_toast()
+    question_input= st.chat_input("输入问题，按回车发送",on_submit=question_state_to_sent,key='question_input',disabled=st.session_state.get('game_object').status in ['win','lose'] or st.session_state.get('question_state') == 'sent')
 
     if st.session_state.get('question_input') :
         with st.chat_message("user"):
             st.markdown(st.session_state.get('question_input'))
+        
+        
         with st.chat_message("assistant",avatar='🐢'):
             create_new_sys_msg()
         st.session_state['question_state'] = None
-        st.experimental_rerun()
+        
+        st.rerun()
+        
+        
     
     if st.session_state.get('game_object').status == 'win':
         st.balloons()

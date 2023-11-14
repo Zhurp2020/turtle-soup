@@ -17,7 +17,7 @@ init_message = '''
 
 请确保你完全理解了规则，并且已经准备好了谜题。现在，你可以扮演【主持人】，对我说：“开始游戏”并告诉我谜面。
 
-注意：你要扮演主持人的角色。你不需要生成问题。你需要生成谜面，让我扮演玩家的角色来提问
+注意：你要扮演主持人的角色。你不需要生成问题。你需要生成谜面，让我扮演玩家的角色来提问。玩家的提问应该是一个一般疑问句。如果玩家的提问不是一个一般疑问句（不能用是否回答），那么请你说“无效问题”
 '''
 
 def check_api_token(token:str) -> bool:
@@ -48,8 +48,8 @@ class game(object):
         '''
         self.status = None
         self.dialogues = []
-        self.dialogue_pure_text = [['开始游戏',None]]
-        self.rounds = 3
+        self.dialogue_pure_text = [['开始游戏，一共有十次提问机会',None]]
+        self.rounds = 10
         self.top_p = 0.8
         self.temperature = 0.95
         
@@ -114,7 +114,7 @@ class game(object):
         return: is_end, bool
         '''
         _,is_end = self.send_message('玩家是否猜到了故事的真相？仅以“是”或“不是”回答，不要给出其他信息。你的回答应该是“是”或“不是”或者“无法判断”',system_msg='你是海龟汤游戏的主持人。对于这个问题，你应该回答“是”或“不是”或者“无法判断”')
-        print(_,is_end)
+        #print(_,is_end)
         return is_end
     
     def check_bad_story(self,story:str) -> bool:
@@ -147,7 +147,7 @@ class game(object):
             self.dialogues = []
             _,init_response = self.send_message(init_msg)
         self.add_to_dialogue(init_response)
-        self.dialogue_pure_text[0][0] = '开始游戏'
+        self.dialogue_pure_text[0][0] = '开始游戏，你一共有10次提问机会！'
         return self.dialogue_pure_text  
         
     def step(self,msg:str) :
@@ -155,7 +155,7 @@ class game(object):
         go one step in game, send message(user question) to erniebot, ask if game is end, if end, set status to 'end' 
         return dialogue_pure_text
         '''
-        question,response = self.send_message(msg)
+        question,response = self.send_message(msg,system_msg='如果玩家问的问题不是一个一般疑问句，请说“无效问题”')
         self.add_to_dialogue(question)
         self.add_to_dialogue(response)
         
