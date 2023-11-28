@@ -1,7 +1,7 @@
 import erniebot
 
 init_message = '''
-现在，让我们来玩一个情景推理游戏，叫做海龟汤。你将扮演【主持人】，而我将扮演【玩家】。
+现在，让我们来玩一个情景推理游戏。你将扮演【主持人】，而我将扮演【玩家】。
 
 游戏规则如下：【主持人】提出一个难以理解的情景作为谜面，而【玩家】可以通过提问来尝试缩小范围并找出事件背后的真正原因。【主持人】可以用“是”、“不是”或“没有关系（与事件无关）”来回答，并给出简短的解释。
 
@@ -30,7 +30,7 @@ def check_api_token(token:str) -> bool:
     erniebot.access_token = token
     try:
         erniebot.ChatCompletion.create(
-            model='ernie-bot',
+            model='ernie-bot-4',
             messages=[{'role': 'user', 'content': '你好'}])
         return True
     except:
@@ -89,7 +89,7 @@ class game(object):
         new_msg = {'role': 'user', 'content': msg}
         self.dialogues.append(new_msg)
         response = erniebot.ChatCompletion.create(
-            model='ernie-bot',
+            model='ernie-bot-4',
             messages=self.dialogues,
             system = system_msg,
             top_p=self.top_p,temperature=self.temperature)
@@ -113,7 +113,7 @@ class game(object):
         ask erniebot if game has ended
         return: is_end, bool
         '''
-        _,is_end = self.send_message('玩家是否猜到了故事的真相？仅以“是”或“不是”回答，不要给出其他信息。你的回答应该是“是”或“不是”或者“无法判断”',system_msg='你是海龟汤游戏的主持人。对于这个问题，你应该回答“是”或“不是”或者“无法判断”')
+        _,is_end = self.send_message('玩家是否猜到了故事的真相？仅以“是”或“不是”回答，不要给出其他信息。你的回答应该是“是”或“不是”或者“无法判断”',system_msg='你是游戏的主持人。对于这个问题，你应该回答“是”或“不是”或者“无法判断”')
         #print(_,is_end)
         return is_end
     
@@ -142,7 +142,7 @@ class game(object):
             style = '、'.join(style)
         self.set_story_style(style)
         init_msg = self.init_message
-        _,init_response = self.send_message(init_msg,'你需要扮演海龟汤游戏的主持人，告诉玩家谜面。')
+        _,init_response = self.send_message(init_msg,'你需要扮演游戏的主持人，告诉玩家谜面。')
         while self.check_bad_story(init_response['content']):
             self.dialogues = []
             _,init_response = self.send_message(init_msg)

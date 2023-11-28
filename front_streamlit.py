@@ -170,7 +170,7 @@ if st.session_state.get('game_state') in ['start','started']:
     with col2:
         reset = st.button(label='重置游戏',type='primary',use_container_width= True,on_click=reset_game)
 
-if st.session_state.get('game_state') in ['started'] and st.session_state.get('game_object').rounds <= 7:
+if st.session_state.get('game_state') in ['started'] and 0 <  st.session_state.get('game_object').rounds <= 7:
     with col3:
         hint = st.button(label='给点提示',use_container_width= True,on_click=hint_state_to_sent)
 if st.session_state.get('hint_state') == 'sent':
